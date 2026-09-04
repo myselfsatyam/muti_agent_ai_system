@@ -5,14 +5,22 @@ from langchain_core.output_parsers import StrOutputParser
 from tools import web_search , scrape_url 
 from dotenv import load_dotenv
 import os
+import streamlit as st
 
 load_dotenv()
+
+def get_secret(name: str):
+    value = os.getenv(name)
+    if value:
+        return value
+    return st.secrets.get(name)
+
 
 #model setup 
 llm = ChatGroq(
     model="openai/gpt-oss-120b",
     temperature=0,
-    groq_api_key=os.getenv("GROQ_API_KEY"),
+    groq_api_key=get_secret("GROQ_API_KEY"),
 )
 
 
