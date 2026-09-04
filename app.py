@@ -411,9 +411,19 @@ if st.session_state.running and not st.session_state.done:
     # ── Step 1: Search ──
     with st.spinner("🔍  Search Agent is working…"):
         search_agent = build_search_agent()
-        sr = search_agent.invoke({
-            "messages": [("user", f"Find recent, reliable and detailed information about: {topic_val}")]
-        })
+        try:
+            sr = search_agent.invoke({
+                "messages": [("user", f"Find recent, reliable and detailed information about: {topic_val}")]
+            })
+        except Exception as exc:
+            st.session_state.running = False
+            st.error(
+                "The research request could not be completed. "
+                "Check your Groq API key, model access, quota, and rate limits, "
+                "then try again."
+            )
+            st.caption(f"Details: {exc}")
+            st.stop()
         results["search"] = sr["messages"][-1].content
         st.session_state.results = dict(results)
     st.rerun() if False else None   # keep inline for now
